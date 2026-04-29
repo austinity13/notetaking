@@ -1,0 +1,476 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+input,textarea,button{font-family:inherit}
+.app{display:flex;min-height:640px;font-size:14px;color:var(--color-text-primary)}
+.sidebar{width:220px;flex-shrink:0;border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column}
+.sidebar-header{padding:14px 14px 10px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.brand{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.brand-icon{width:28px;height:28px;background:#2563eb;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-name{font-size:15px;font-weight:600;letter-spacing:-0.3px}
+.new-quiz-btn{width:100%;padding:7px 10px;border-radius:7px;border:0.5px dashed var(--color-border-secondary);background:transparent;cursor:pointer;font-size:12px;font-weight:500;color:var(--color-text-secondary);display:flex;align-items:center;gap:6px;transition:background .12s}
+.new-quiz-btn:hover{background:var(--color-background-secondary)}
+.quiz-list{flex:1;overflow-y:auto;padding:6px 8px}
+.quiz-item{padding:8px 10px;border-radius:8px;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;justify-content:space-between;gap:4px;transition:background .1s}
+.quiz-item:hover{background:var(--color-background-secondary)}
+.quiz-item.active{background:#eff6ff}
+.quiz-item-name{font-size:13px;font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--color-text-primary)}
+.quiz-item.active .quiz-item-name{color:#1d4ed8}
+.quiz-item-count{font-size:11px;color:var(--color-text-secondary);flex-shrink:0}
+.quiz-del{width:20px;height:20px;border:none;background:transparent;cursor:pointer;border-radius:4px;display:none;align-items:center;justify-content:center;color:var(--color-text-secondary);flex-shrink:0}
+.quiz-item:hover .quiz-del{display:flex}
+.quiz-del:hover{background:var(--color-background-tertiary);color:var(--color-text-danger,#dc2626)}
+.sidebar-section{padding:8px 8px 4px;font-size:10px;font-weight:500;color:var(--color-text-secondary);letter-spacing:.6px;text-transform:uppercase}
+.nav-item{padding:7px 10px;border-radius:8px;cursor:pointer;margin-bottom:2px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--color-text-secondary);transition:background .1s}
+.nav-item:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.nav-item.active{background:#eff6ff;color:#1d4ed8}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{padding:12px 20px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:10px}
+.title-input{font-size:16px;font-weight:600;border:none;outline:none;background:transparent;color:var(--color-text-primary);letter-spacing:-0.2px;flex:1;min-width:0}
+.title-input::placeholder{color:var(--color-text-secondary)}
+.badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500}
+.badge-blue{background:#eff6ff;color:#1d4ed8}
+.badge-gray{background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary)}
+.topbar-actions{display:flex;gap:6px;align-items:center;margin-left:auto}
+.btn{padding:6px 12px;border-radius:7px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .1s}
+.btn:hover{background:var(--color-background-tertiary)}
+.btn-primary{background:#2563eb;border-color:#2563eb;color:#fff}
+.btn-primary:hover{background:#1d4ed8;border-color:#1d4ed8}
+.content{flex:1;padding:20px;overflow-y:auto}
+.empty-qs{text-align:center;padding:3rem 1rem;color:var(--color-text-secondary)}
+.empty-icon{width:48px;height:48px;border-radius:10px;border:1.5px dashed var(--color-border-secondary);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.q-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:14px 16px;margin-bottom:10px;transition:border-color .15s}
+.q-card:hover{border-color:var(--color-border-secondary)}
+.q-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.q-num{font-size:10px;font-weight:600;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:5px;padding:2px 7px;color:var(--color-text-secondary);letter-spacing:.4px;text-transform:uppercase;flex-shrink:0}
+.q-text-input{flex:1;padding:6px 10px;border-radius:7px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary);font-size:13px;font-weight:500;outline:none}
+.q-text-input:focus{border-color:#93c5fd;background:var(--color-background-primary)}
+.q-actions{display:flex;gap:4px;flex-shrink:0}
+.icon-btn{width:28px;height:28px;border-radius:6px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--color-text-secondary);transition:all .1s}
+.icon-btn:hover{background:var(--color-background-tertiary);color:var(--color-text-primary)}
+.icon-btn.danger:hover{background:#fef2f2;border-color:#fca5a5;color:#dc2626}
+.opt-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.opt-circle{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--color-border-secondary);background:transparent;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.opt-circle.correct{background:#2563eb;border-color:#2563eb}
+.opt-letter{width:20px;font-size:11px;font-weight:500;color:var(--color-text-secondary);text-align:center;flex-shrink:0;font-family:var(--font-mono,'monospace')}
+.opt-input{flex:1;padding:5px 9px;border-radius:6px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);color:var(--color-text-primary);font-size:13px;outline:none}
+.opt-input:focus{border-color:#93c5fd}
+.opt-input.correct-bg{border-color:#93c5fd;background:#eff6ff}
+.opt-remove{width:20px;height:20px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:4px;color:var(--color-text-secondary);flex-shrink:0}
+.opt-remove:hover{background:#fef2f2;color:#dc2626}
+.q-footer{display:flex;align-items:center;gap:8px;margin-top:8px}
+.add-opt-btn{padding:4px 10px;border-radius:6px;border:0.5px dashed var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);font-size:12px;font-weight:500;cursor:pointer;transition:background .1s}
+.add-opt-btn:hover{background:var(--color-background-secondary)}
+.type-pill{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary)}
+.hint{font-size:11px;color:var(--color-text-secondary);margin-left:auto}
+.pv-start{text-align:center;padding:2.5rem 1rem}
+.pv-icon{width:56px;height:56px;border-radius:14px;background:#eff6ff;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.prog-bar{height:3px;background:var(--color-background-secondary);border-radius:2px;margin-bottom:16px;overflow:hidden}
+.prog-fill{height:100%;background:#2563eb;border-radius:2px;transition:width .3s}
+.opt-answer-btn{width:100%;text-align:left;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);cursor:pointer;margin-bottom:7px;transition:all .12s;color:var(--color-text-primary);font-size:13px}
+.opt-answer-btn:hover{border-color:#93c5fd;background:#f8faff}
+.opt-answer-btn.sel{border-color:#2563eb;background:#eff6ff}
+.opt-answer-btn.correct-ans{border-color:#16a34a;background:#f0fdf4}
+.opt-answer-btn.wrong-ans{border-color:#dc2626;background:#fef2f2}
+.opt-lbl{width:24px;height:24px;border-radius:6px;background:var(--color-background-secondary);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-mono,'monospace')}
+.sel .opt-lbl{background:#2563eb;color:#fff}
+.correct-ans .opt-lbl{background:#16a34a;color:#fff}
+.wrong-ans .opt-lbl{background:#dc2626;color:#fff}
+.results-ring{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:20px;font-weight:600}
+.review-item{padding:9px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.note-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:10px;padding:12px 14px}
+.note-title-inp{font-size:13px;font-weight:500;border:none;outline:none;background:transparent;color:var(--color-text-primary);width:100%;margin-bottom:6px}
+.note-body-inp{font-size:12px;border:none;outline:none;background:transparent;color:var(--color-text-secondary);width:100%;resize:none;line-height:1.6;min-height:60px}
+.note-del{float:right;width:20px;height:20px;border:none;background:transparent;cursor:pointer;border-radius:4px;color:var(--color-text-secondary);display:flex;align-items:center;justify-content:center}
+.note-del:hover{color:#dc2626;background:#fef2f2}
+.tab-bar{display:flex;gap:2px;padding:0 20px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.tab{padding:8px 14px;border:none;background:transparent;color:var(--color-text-secondary);font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-0.5px;transition:color .12s}
+.tab.active{color:#2563eb;border-bottom-color:#2563eb}
+.tab:hover:not(.active){color:var(--color-text-primary)}
+</style>
+
+<h2 class="sr-only" style="position:absolute;left:-9999px">QuizCraft — multi-quiz builder and preview app</h2>
+
+<div class="app" id="app">
+ <div class="sidebar">
+  <div class="sidebar-header">
+   <div class="brand">
+    <div class="brand-icon">
+     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    </div>
+    <span class="brand-name">QuizCraft</span>
+   </div>
+   <button class="new-quiz-btn" onclick="newQuiz()">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    New quiz
+   </button>
+  </div>
+  <div style="padding:6px 8px 2px">
+   <div class="sidebar-section" style="padding:8px 4px 4px">Quizzes</div>
+   <div class="quiz-list" id="quiz-list"></div>
+  </div>
+  <div style="border-top:0.5px solid var(--color-border-tertiary);padding:6px 8px">
+   <div class="sidebar-section" style="padding:8px 4px 4px">Tools</div>
+   <div class="nav-item" id="nav-notes" onclick="openNotes()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    Notes
+   </div>
+  </div>
+ </div>
+
+ <div class="main" id="main-panel">
+  <div id="home-view">
+   <div style="padding:60px 20px;text-align:center;color:var(--color-text-secondary)">
+    <div style="width:52px;height:52px;border-radius:14px;background:#eff6ff;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
+     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    </div>
+    <p style="font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px">Welcome to QuizCraft</p>
+    <p style="font-size:13px;margin-bottom:20px">Create a quiz from the sidebar to get started</p>
+    <button class="btn btn-primary" onclick="newQuiz()" style="margin:0 auto;display:inline-flex">
+     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+     New quiz
+    </button>
+   </div>
+  </div>
+  <div id="quiz-view" style="display:none;flex-direction:column;flex:1"></div>
+  <div id="notes-view" style="display:none;flex-direction:column;flex:1"></div>
+ </div>
+</div>
+
+<script>
+let quizzes = [
+  {id:1,title:'Geography Basics',questions:[
+    {id:1,text:'What is the capital of France?',options:['London','Paris','Berlin','Madrid'],correct:1},
+    {id:2,text:'Which is the largest ocean?',options:['Atlantic','Indian','Pacific','Arctic'],correct:2}
+  ]},
+  {id:2,title:'Science Quick-Fire',questions:[
+    {id:1,text:'True or False: The sun is a planet.',options:['True','False'],correct:1},
+    {id:2,text:'What gas do plants absorb?',options:['Oxygen','Nitrogen','Carbon Dioxide','Hydrogen'],correct:2}
+  ]}
+];
+let notes = [{id:1,title:'Study tips',body:'Review chapters 3–5 before the exam.'}];
+let nextQzId=3,nextQId=10,nextNId=2;
+let activeQuizId=null,activeView='home',activeTab='builder';
+let quizState={started:false,currentQ:0,score:0,answers:[]};
+
+function $(id){return document.getElementById(id)}
+
+function renderSidebar(){
+  const list=$('quiz-list');
+  list.innerHTML=quizzes.map(qz=>`
+   <div class="quiz-item${activeQuizId===qz.id?' active':''}" onclick="openQuiz(${qz.id})">
+    <span class="quiz-item-name">${esc(qz.title)}</span>
+    <span class="quiz-item-count">${qz.questions.length}</span>
+    <button class="quiz-del" onclick="event.stopPropagation();deleteQuiz(${qz.id})" title="Delete">
+     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+   </div>`).join('');
+  $('nav-notes').className='nav-item'+(activeView==='notes'?' active':'');
+}
+
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function showView(name){
+  $('home-view').style.display=name==='home'?'block':'none';
+  $('quiz-view').style.display=name==='quiz'?'flex':'none';
+  $('notes-view').style.display=name==='notes'?'flex':'none';
+  activeView=name;
+  renderSidebar();
+}
+
+function newQuiz(){
+  const qz={id:nextQzId++,title:'Untitled Quiz',questions:[]};
+  quizzes.push(qz);
+  openQuiz(qz.id);
+}
+
+function deleteQuiz(id){
+  quizzes=quizzes.filter(q=>q.id!==id);
+  if(activeQuizId===id){activeQuizId=null;showView('home');}
+  else renderSidebar();
+}
+
+function openQuiz(id){
+  activeQuizId=id;
+  activeTab='builder';
+  quizState={started:false,currentQ:0,score:0,answers:[]};
+  showView('quiz');
+  renderQuizView();
+}
+
+function getQuiz(){return quizzes.find(q=>q.id===activeQuizId)}
+
+function renderQuizView(){
+  const qz=getQuiz();
+  if(!qz)return;
+  const v=$('quiz-view');
+  v.innerHTML=`
+   <div class="topbar">
+    <input class="title-input" id="quiz-title-inp" value="${esc(qz.title)}" placeholder="Quiz title..." oninput="updateTitle(this.value)" style="max-width:280px">
+    <span class="badge badge-gray" id="q-count-badge">${qz.questions.length} question${qz.questions.length!==1?'s':''}</span>
+    <div class="topbar-actions">
+     <button class="btn" onclick="exportQuiz()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export
+     </button>
+     <button class="btn" onclick="importJSON()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Import
+     </button>
+     <button class="btn btn-primary" onclick="addQuestion()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add question
+     </button>
+    </div>
+   </div>
+   <div class="tab-bar">
+    <button class="tab${activeTab==='builder'?' active':''}" onclick="switchTab('builder')">Builder</button>
+    <button class="tab${activeTab==='preview'?' active':''}" onclick="switchTab('preview')">Preview</button>
+   </div>
+   <div class="content" id="tab-content"></div>`;
+  renderTabContent();
+}
+
+function switchTab(t){
+  activeTab=t;
+  quizState={started:false,currentQ:0,score:0,answers:[]};
+  renderQuizView();
+}
+
+function updateTitle(val){
+  const qz=getQuiz();if(!qz)return;
+  qz.title=val;
+  renderSidebar();
+  const b=$('q-count-badge');
+  if(b)b.textContent=qz.questions.length+' question'+(qz.questions.length!==1?'s':'');
+}
+
+function renderTabContent(){
+  if(activeTab==='builder')renderBuilder();
+  else renderPreview();
+}
+
+function renderBuilder(){
+  const qz=getQuiz();
+  const c=$('tab-content');
+  if(!qz){return;}
+  if(qz.questions.length===0){
+    c.innerHTML=`<div class="empty-qs"><div class="empty-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><p style="font-weight:500;color:var(--color-text-primary);margin-bottom:4px">No questions yet</p><p style="font-size:12px">Click "Add question" above to begin</p></div>`;
+    return;
+  }
+  const letters=['A','B','C','D','E','F'];
+  c.innerHTML=qz.questions.map((q,qi)=>{
+    const typeLabel=q.options.length===2?'True / False':q.options.length+'-option';
+    const opts=q.options.map((opt,oi)=>`
+     <div class="opt-row">
+      <button class="opt-circle${q.correct===oi?' correct':''}" onclick="setCorrect(${q.id},${oi})" title="Mark correct">
+       ${q.correct===oi?`<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`:''}
+      </button>
+      <span class="opt-letter">${letters[oi]}</span>
+      <input class="opt-input${q.correct===oi?' correct-bg':''}" value="${esc(opt)}" placeholder="Option ${letters[oi]}…" oninput="updateOpt(${q.id},${oi},this.value)">
+      ${q.options.length>2?`<button class="opt-remove" onclick="removeOpt(${q.id},${oi})" title="Remove"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`:`<div style="width:20px"></div>`}
+     </div>`).join('');
+    return `<div class="q-card">
+     <div class="q-header">
+      <span class="q-num">Q${qi+1}</span>
+      <input class="q-text-input" value="${esc(q.text)}" placeholder="Type your question…" oninput="updateQText(${q.id},this.value)" style="flex:1">
+      <div class="q-actions">
+       ${qi>0?`<button class="icon-btn" onclick="moveQ(${q.id},-1)" title="Move up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg></button>`:''}
+       ${qi<qz.questions.length-1?`<button class="icon-btn" onclick="moveQ(${q.id},1)" title="Move down"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></button>`:''}
+       <button class="icon-btn danger" onclick="removeQ(${q.id})" title="Delete"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+      </div>
+     </div>
+     ${opts}
+     <div class="q-footer">
+      ${q.options.length<6?`<button class="add-opt-btn" onclick="addOpt(${q.id})">+ Add option</button>`:'<span class="type-pill">Max 6 options</span>'}
+      <span class="type-pill" style="margin-left:${q.options.length<6?'6px':'0'}">${typeLabel}</span>
+      <span class="hint">Circle = correct answer</span>
+     </div>
+    </div>`;
+  }).join('');
+}
+
+function addQuestion(){
+  const qz=getQuiz();if(!qz)return;
+  qz.questions.push({id:nextQId++,text:'',options:['',''],correct:0});
+  renderQuizView();
+  updateBadge();
+}
+
+function removeQ(id){
+  const qz=getQuiz();if(!qz)return;
+  qz.questions=qz.questions.filter(q=>q.id!==id);
+  renderQuizView();updateBadge();
+}
+
+function moveQ(id,dir){
+  const qz=getQuiz();if(!qz)return;
+  const i=qz.questions.findIndex(q=>q.id===id);
+  const ni=i+dir;
+  if(ni<0||ni>=qz.questions.length)return;
+  [qz.questions[i],qz.questions[ni]]=[qz.questions[ni],qz.questions[i]];
+  renderBuilder();
+}
+
+function updateQText(id,val){const qz=getQuiz();if(!qz)return;const q=qz.questions.find(q=>q.id===id);if(q)q.text=val;}
+function updateOpt(qid,oi,val){const qz=getQuiz();if(!qz)return;const q=qz.questions.find(q=>q.id===qid);if(q)q.options[oi]=val;}
+function setCorrect(qid,oi){const qz=getQuiz();if(!qz)return;const q=qz.questions.find(q=>q.id===qid);if(q){q.correct=oi;renderBuilder();}}
+function addOpt(qid){const qz=getQuiz();if(!qz)return;const q=qz.questions.find(q=>q.id===qid);if(q&&q.options.length<6){q.options.push('');renderBuilder();}}
+function removeOpt(qid,oi){const qz=getQuiz();if(!qz)return;const q=qz.questions.find(q=>q.id===qid);if(q&&q.options.length>2){q.options.splice(oi,1);if(q.correct>=q.options.length)q.correct=0;renderBuilder();}}
+function updateBadge(){const qz=getQuiz();const b=$('q-count-badge');if(b&&qz)b.textContent=qz.questions.length+' question'+(qz.questions.length!==1?'s':'');renderSidebar();}
+
+function renderPreview(){
+  const qz=getQuiz();const c=$('tab-content');
+  if(!qz||qz.questions.length===0){c.innerHTML='<div class="empty-qs"><p style="color:var(--color-text-secondary);font-size:13px">No questions to preview. Add some in the builder.</p></div>';return;}
+  if(!quizState.started){
+    c.innerHTML=`<div class="pv-start">
+     <div class="pv-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+     <p style="font-size:16px;font-weight:600;margin-bottom:6px">${esc(qz.title)}</p>
+     <p style="color:var(--color-text-secondary);font-size:13px;margin-bottom:20px">${qz.questions.length} question${qz.questions.length!==1?'s':''}</p>
+     <button class="btn btn-primary" onclick="startQuiz()" style="margin:0 auto;display:inline-flex;padding:8px 24px">Start quiz</button>
+    </div>`;
+    return;
+  }
+  if(quizState.done){renderResults();return;}
+  renderQuestion();
+}
+
+function startQuiz(){
+  quizState={started:true,done:false,currentQ:0,score:0,answers:new Array(getQuiz().questions.length).fill(null)};
+  renderTabContent();
+}
+
+function renderQuestion(){
+  const qz=getQuiz();const c=$('tab-content');
+  const qi=quizState.currentQ;const q=qz.questions[qi];
+  const sel=quizState.answers[qi];
+  const pct=Math.round((qi/qz.questions.length)*100);
+  const letters=['A','B','C','D','E','F'];
+  c.innerHTML=`
+   <div style="max-width:520px;margin:0 auto;padding-top:8px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+     <span style="font-size:12px;color:var(--color-text-secondary)">Question ${qi+1} of ${qz.questions.length}</span>
+     <span style="font-size:12px;color:var(--color-text-secondary)">Score: ${quizState.score}/${qi}</span>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+    <p style="font-size:15px;font-weight:500;margin-bottom:16px;line-height:1.5">${esc(q.text)||'(No question text)'}</p>
+    ${q.options.map((opt,oi)=>`
+     <button class="opt-answer-btn${sel===oi?' sel':''}" onclick="selectAnswer(${oi})">
+      <span class="opt-lbl">${letters[oi]}</span>
+      ${esc(opt)||'(empty)'}
+     </button>`).join('')}
+    <div style="display:flex;gap:8px;margin-top:16px">
+     ${qi>0?`<button class="btn" onclick="prevQ()">← Back</button>`:''}
+     <button class="btn btn-primary" onclick="nextQ()" ${sel===null?'disabled style="opacity:.4;cursor:default"':''} style="margin-left:auto">${qi===qz.questions.length-1?'Finish':'Next →'}</button>
+    </div>
+   </div>`;
+}
+
+function selectAnswer(oi){quizState.answers[quizState.currentQ]=oi;renderQuestion();}
+function prevQ(){quizState.currentQ--;renderQuestion();}
+function nextQ(){
+  const qz=getQuiz();const qi=quizState.currentQ;
+  if(quizState.answers[qi]===qz.questions[qi].correct)quizState.score++;
+  if(qi<qz.questions.length-1){quizState.currentQ++;renderQuestion();}
+  else{quizState.done=true;renderResults();}
+}
+
+function renderResults(){
+  const qz=getQuiz();const c=$('tab-content');
+  const pct=Math.round((quizState.score/qz.questions.length)*100);
+  const col=pct>=80?'#16a34a':pct>=60?'#d97706':'#dc2626';
+  const bg=pct>=80?'#f0fdf4':pct>=60?'#fffbeb':'#fef2f2';
+  const msg=pct>=80?'Excellent work!':pct>=60?'Good effort!':'Keep practicing!';
+  const letters=['A','B','C','D','E','F'];
+  const review=qz.questions.map((q,qi)=>{
+    const ua=quizState.answers[qi];const ok=ua===q.correct;
+    return `<div class="review-item">
+     <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:3px">
+      <span style="font-size:11px;padding:1px 6px;border-radius:4px;background:${ok?'#f0fdf4':'#fef2f2'};color:${ok?'#16a34a':'#dc2626'};font-weight:500;flex-shrink:0">${ok?'✓':'✗'}</span>
+      <span style="font-size:13px;font-weight:500">${esc(q.text)||'(No text)'}</span>
+     </div>
+     <div style="padding-left:28px;font-size:12px;color:var(--color-text-secondary)">
+      Your answer: <span style="color:${ok?'#16a34a':'#dc2626'}">${ua!==null?esc(q.options[ua])||'(empty)':'Skipped'}</span>
+      ${!ok?` · Correct: <span style="color:#16a34a">${esc(q.options[q.correct])||'(empty)'}</span>`:''}
+     </div>
+    </div>`;}).join('');
+  c.innerHTML=`<div style="max-width:520px;margin:0 auto;padding-top:8px">
+   <div style="text-align:center;margin-bottom:20px">
+    <div class="results-ring" style="background:${bg};color:${col}">${pct}%</div>
+    <p style="font-weight:600;font-size:16px;margin-bottom:4px">${msg}</p>
+    <p style="color:var(--color-text-secondary);font-size:13px">${quizState.score} of ${qz.questions.length} correct</p>
+   </div>
+   <div style="background:var(--color-background-secondary);border-radius:10px;padding:12px 16px;margin-bottom:16px">
+    <p style="font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase">Review</p>
+    ${review}
+   </div>
+   <div style="text-align:center">
+    <button class="btn btn-primary" onclick="startQuiz()" style="display:inline-flex;margin:0 auto;padding:8px 24px">Retake quiz</button>
+   </div>
+  </div>`;
+}
+
+function openNotes(){
+  activeQuizId=null;
+  showView('notes');
+  renderNotesView();
+}
+
+function renderNotesView(){
+  const v=$('notes-view');
+  v.innerHTML=`
+   <div class="topbar">
+    <span style="font-size:16px;font-weight:600">Study Notes</span>
+    <button class="btn btn-primary" onclick="addNote()" style="margin-left:auto">
+     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+     Add note
+    </button>
+   </div>
+   <div class="content"><div class="notes-grid" id="notes-grid"></div></div>`;
+  renderNotes();
+}
+
+function renderNotes(){
+  const g=$('notes-grid');if(!g)return;
+  if(notes.length===0){g.innerHTML='<p style="color:var(--color-text-secondary);font-size:13px;grid-column:1/-1;text-align:center;padding:2rem">No notes yet. Click "Add note" to get started.</p>';return;}
+  g.innerHTML=notes.map(n=>`
+   <div class="note-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+     <input class="note-title-inp" value="${esc(n.title)}" placeholder="Title…" oninput="updateNote(${n.id},'title',this.value)">
+     <button class="note-del" onclick="deleteNote(${n.id})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <textarea class="note-body-inp" placeholder="Write your notes…" oninput="updateNote(${n.id},'body',this.value)">${esc(n.body)}</textarea>
+   </div>`).join('');
+}
+
+function addNote(){notes.push({id:nextNId++,title:'New note',body:''});renderNotes();}
+function deleteNote(id){notes=notes.filter(n=>n.id!==id);renderNotes();}
+function updateNote(id,f,v){const n=notes.find(n=>n.id===id);if(n)n[f]=v;}
+
+function exportQuiz(){
+  const qz=getQuiz();if(!qz)return;
+  const blob=new Blob([JSON.stringify({title:qz.title,questions:qz.questions},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(qz.title||'quiz').replace(/\s+/g,'_')+'.json';a.click();
+}
+
+function importJSON(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='.json';
+  inp.onchange=e=>{
+    const file=e.target.files[0];if(!file)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{
+        const d=JSON.parse(ev.target.result);
+        const qz=getQuiz();if(!qz)return;
+        if(d.title)qz.title=d.title;
+        if(Array.isArray(d.questions))qz.questions=d.questions;
+        nextQId=Math.max(...qz.questions.map(q=>q.id||0),nextQId)+1;
+        renderQuizView();updateBadge();
+      }catch{alert('Invalid JSON file.');}
+    };r.readAsText(file);
+  };inp.click();
+}
+
+renderSidebar();
+</script>
